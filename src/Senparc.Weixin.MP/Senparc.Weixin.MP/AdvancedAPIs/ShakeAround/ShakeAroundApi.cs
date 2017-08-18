@@ -1,4 +1,24 @@
-﻿/*----------------------------------------------------------------
+﻿#region Apache License Version 2.0
+/*----------------------------------------------------------------
+
+Copyright 2017 Jeffrey Su & Suzhou Senparc Network Technology Co.,Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
+
+----------------------------------------------------------------*/
+#endregion Apache License Version 2.0
+
+/*----------------------------------------------------------------
     Copyright (C) 2017 Senparc
 
     文件名：ShakeAroundApi.cs
@@ -28,6 +48,13 @@
 
     修改标识：Senparc 20170110
     修改描述：将lastSeen参数调整为long类型
+
+    修改标识：Senparc 20170509
+    修改描述：v14.4.7 修改 GroupGetAdddevice 数据结构
+
+    修改标识：Senparc - 20170707
+    修改描述：v14.5.1 完善异步方法async/await
+
 ----------------------------------------------------------------*/
 
 /*
@@ -41,6 +68,7 @@ using Senparc.Weixin.Entities;
 using Senparc.Weixin.HttpUtility;
 using Senparc.Weixin.MP.AdvancedAPIs.ShakeAround;
 using Senparc.Weixin.MP.CommonAPIs;
+using System.Linq;
 
 namespace Senparc.Weixin.MP.AdvancedAPIs
 {
@@ -54,7 +82,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 申请开通功能
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="data"></param>
         /// <param name="industry_Id"></param>
         /// <param name="timeOut"></param>
@@ -74,7 +102,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 查询审核状态
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <returns></returns>
         public static GetAuditStatusResultJson GetAuditStatus(string accessTokenOrAppId)
         {
@@ -146,7 +174,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// 设备编号，若填了UUID、major、minor，则可不填设备编号，若二者都填，则以设备编号为优先
         /// UUID、major、minor，三个信息需填写完整，若填了设备编号，则可不填此信息。
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceId">设备编号</param>
         /// <param name="uuId"></param>
         /// <param name="major"></param>
@@ -277,7 +305,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 根据指定的设备Id查询设备列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceIdentifiers">设备Id列表</param>
         /// 设备编号，若填了UUID、major、minor，则可不填设备编号，若二者都填，则以设备编号为优先
         /// UUID、major、minor，三个信息需填写完整，若填了设备编号，则可不填此信息。
@@ -300,7 +328,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 根据分页查询或者指定范围查询设备列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="lastSeen">前一次查询列表末尾的设备ID，第一次查询lastSeen为0</param>
         /// <param name="count">待查询的设备数量，不能超过50个</param>
         /// <param name="timeOut"></param>
@@ -323,7 +351,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 根据批次ID查询设备列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="applyId">批次ID，申请设备ID时所返回的批次ID</param>
         /// <param name="lastSeen">前一次查询列表末尾的设备ID，第一次查询lastSeen为0</param>
         /// <param name="count">待查询的设备数量，不能超过50个</param>
@@ -351,7 +379,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// 上传图片素材
         /// 上传在摇一摇页面展示的图片素材，素材保存在微信侧服务器上。 格式限定为：jpg,jpeg,png,gif，图片大小建议120px*120 px，限制不超过200 px *200 px，图片需为正方形。
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="file"></param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
@@ -441,7 +469,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 根据页面Id查询页面列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="pageIds">指定页面的Id数组</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
@@ -464,7 +492,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 根据分页或者指定范围查询页面列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="begin"></param>
         /// <param name="count"></param>
         /// <param name="timeOut"></param>
@@ -491,7 +519,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 删除页面
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="pageId">指定页面的Id数组</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
@@ -515,7 +543,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// 配置设备与页面的关联关系
         /// 配置设备与页面的关联关系。支持建立或解除关联关系，也支持新增页面或覆盖页面等操作。配置完成后，在此设备的信号范围内，即可摇出关联的页面信息。若设备配置多个页面，则随机出现页面信息。一个设备最多可配置30个关联页面。
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceIdentifier"></param>
         /// 设备编号，若填了UUID、major、minor，则可不填设备编号，若二者都填，则以设备编号为优先
         /// UUID、major、minor，三个信息需填写完整，若填了设备编号，则可不填此信息
@@ -546,7 +574,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         ///  查询设备的关联关系
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceIdentifier">指定的设备</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
@@ -570,7 +598,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 查询页面的关联关系
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="pageId">指定的页面id</param>
         /// <param name="begin">关联关系列表的起始索引值</param>
         /// <param name="count">待查询的关联关系数量，不能超过50个</param>
@@ -746,8 +774,6 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                 var data = new
                 {
                     group_name = groupName
-
-
                 };
 
                 return CommonJsonSend.Send<GroupAddResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
@@ -859,31 +885,42 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <param name="deviceIdentifier">分组列表的起始索引值</param>
 
         /// <returns></returns>
-        public static RegisterResultJson GroupGetAdddevice(string accessTokenOrAppId, string groupId, DeviceApply_Data_Device_Identifiers deviceIdentifier, int timeOut = Config.TIME_OUT)
+        public static RegisterResultJson GroupGetAdddevice(string accessTokenOrAppId, string groupId, List<DeviceApply_Data_Device_Identifiers> deviceIdentifiers, int timeOut = Config.TIME_OUT)
         {
             return ApiHandlerWapper.TryCommonApi(accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/adddevice?access_token={0}", accessToken.AsUrlData());
-                object data = null;
-                if (string.IsNullOrEmpty(((long)deviceIdentifier.device_id).ToString()))
+                object data = new
                 {
-                    data = new
+                    group_id = groupId,
+                    device_identifiers = deviceIdentifiers.Select(item =>
                     {
-                        group_id = groupId,
-                        uuid = deviceIdentifier.uuid,
-                        major = deviceIdentifier.major,
-                        minor = deviceIdentifier.minor
-
-                    };
-                }
-                else
-                {
-                    data = new
-                    {
-                        group_id = groupId,
-                        device_id = deviceIdentifier.device_id
-                    };
-                }
+                        object itemData = null;
+                        if (!item.device_id.HasValue)
+                        {
+                            /* UUID、major、minor，三个信息需填写完成，
+                             * 若填了设备编号，即可不填此信息，二者选其一
+                             */
+                            itemData = new
+                            {
+                                uuid = item.uuid,
+                                major = item.major,
+                                minor = item.minor
+                            };
+                        }
+                        else
+                        {
+                            /*设备编号，若填了UUID、major、minor，
+                             * 即可不填设备编号，二者选其一
+                             */
+                            itemData = new
+                            {
+                                device_id = item.device_id
+                            };
+                        }
+                        return itemData;
+                    })
+                };
 
                 return CommonJsonSend.Send<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
@@ -1050,19 +1087,19 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】申请开通功能
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="data"></param>
         /// <param name="industry_Id"></param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
         public static async Task<RegisterResultJson> RegisterAsync(string accessTokenOrAppId, RegisterData data, IndustryId industry_Id, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 string url = string.Format("https://api.weixin.qq.com/shakearound/account/register?access_token={0}", accessToken.AsUrlData());
 
                 data.industry_id = RegisterData.ConvertIndustryId(industry_Id);
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1070,15 +1107,15 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】查询审核状态
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <returns></returns>
         public static async Task<GetAuditStatusResultJson> GetAuditStatusAsync(string accessTokenOrAppId)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 string url = string.Format("https://api.weixin.qq.com/shakearound/account/auditstatus?access_token={0}", accessToken.AsUrlData());
 
-                return Get.GetJsonAsync<GetAuditStatusResultJson>(url);
+                return await Get.GetJsonAsync<GetAuditStatusResultJson>(url);
 
             }, accessTokenOrAppId);
         }
@@ -1095,7 +1132,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<DeviceApplyResultJson> DeviceApplyAsync(string accessTokenOrAppId, int quantity, string applyReason, string comment = null, long? poiId = null, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 string url = string.Format("https://api.weixin.qq.com/shakearound/device/applyid?access_token={0}", accessToken.AsUrlData());
 
@@ -1107,7 +1144,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     poi_id = poiId
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceApplyResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceApplyResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1123,7 +1160,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<GetDeviceStatusResultJson> DeviceApplyStatusAsync(string accessTokenOrAppId, long appId, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 string url = string.Format("https://api.weixin.qq.com/shakearound/device/applystatus?access_token={0}", accessToken.AsUrlData());
 
@@ -1132,7 +1169,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     apply_id = appId,
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GetDeviceStatusResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GetDeviceStatusResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1142,7 +1179,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// 设备编号，若填了UUID、major、minor，则可不填设备编号，若二者都填，则以设备编号为优先
         /// UUID、major、minor，三个信息需填写完整，若填了设备编号，则可不填此信息。
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceId">设备编号</param>
         /// <param name="uuId"></param>
         /// <param name="major"></param>
@@ -1152,7 +1189,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<WxJsonResult> DeviceUpdateAsync(string accessTokenOrAppId, long deviceId, string uuId, long major, long minor, string comment, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 string url = string.Format("https://api.weixin.qq.com/shakearound/device/update?access_token={0}", accessToken.AsUrlData());
 
@@ -1168,7 +1205,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     comment = comment
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1190,7 +1227,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<WxJsonResult> DeviceBindLocatoinAsync(string accessTokenOrAppId, long deviceId, string uuid, long major, long minor, long poiId, string poiAppid, int type = 1, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 string url = string.Format("https://api.weixin.qq.com/shakearound/device/bindlocation?access_token={0}", accessToken.AsUrlData());
 
@@ -1221,7 +1258,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     } as object;
 
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1242,7 +1279,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<WxJsonResult> DeviceBindLocatoinAsync(string accessTokenOrAppId, long deviceId, string uuid, long major, long minor, long poiId, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 string url = string.Format("https://api.weixin.qq.com/shakearound/device/bindlocation?access_token={0}", accessToken.AsUrlData());
 
@@ -1258,7 +1295,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     poi_id = poiId
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1273,7 +1310,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 根据指定的设备Id查询设备列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceIdentifiers">设备Id列表</param>
         /// 设备编号，若填了UUID、major、minor，则可不填设备编号，若二者都填，则以设备编号为优先
         /// UUID、major、minor，三个信息需填写完整，若填了设备编号，则可不填此信息。
@@ -1281,14 +1318,14 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<DeviceSearchResultJson> SearchDeviceByIdAsync(string accessTokenOrAppId, List<DeviceApply_Data_Device_Identifiers> deviceIdentifiers, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var data = new
                 {
                     device_identifiers = deviceIdentifiers
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceSearchResultJson>(accessToken, searchDeviceUrl, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceSearchResultJson>(accessToken, searchDeviceUrl, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1296,14 +1333,14 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】根据分页查询或者指定范围查询设备列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="begin"></param>
         /// <param name="count"></param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
         public static async Task<DeviceSearchResultJson> SearchDeviceByRangeAsync(string accessTokenOrAppId, int begin, int count, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var data = new
                 {
@@ -1311,7 +1348,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     count = count
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceSearchResultJson>(accessToken, searchDeviceUrl, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceSearchResultJson>(accessToken, searchDeviceUrl, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1319,7 +1356,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】根据批次ID查询设备列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="applyId"></param>
         /// <param name="begin"></param>
         /// <param name="count"></param>
@@ -1327,7 +1364,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<DeviceSearchResultJson> SearchDeviceByApplyIdAsync(string accessTokenOrAppId, long applyId, int begin, int count, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var data = new
                 {
@@ -1336,7 +1373,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     count = count
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceSearchResultJson>(accessToken, searchDeviceUrl, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceSearchResultJson>(accessToken, searchDeviceUrl, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1347,18 +1384,18 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// 【异步方法】上传图片素材
         /// 上传在摇一摇页面展示的图片素材，素材保存在微信侧服务器上。 格式限定为：jpg,jpeg,png,gif，图片大小建议120px*120 px，限制不超过200 px *200 px，图片需为正方形。
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="file"></param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
         public static async Task<UploadImageResultJson> UploadImageAsync(string accessTokenOrAppId, string file, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/material/add?access_token={0}", accessToken.AsUrlData());
                 var fileDictionary = new Dictionary<string, string>();
                 fileDictionary["media"] = file;
-                return Post.PostFileGetJsonAsync<UploadImageResultJson>(url, null, fileDictionary, null, timeOut: timeOut);
+                return await Post.PostFileGetJsonAsync<UploadImageResultJson>(url, null, fileDictionary, null, timeOut: timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1377,7 +1414,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         public static async Task<AddPageResultJson> AddPageAsync(string accessTokenOrAppId, string title, string description, string pageUrl,
             string iconUrl, string comment = null, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/page/add?access_token={0}", accessToken.AsUrlData());
 
@@ -1390,7 +1427,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     icon_url = iconUrl
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<AddPageResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<AddPageResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1410,7 +1447,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         public static async Task<UpdatePageResultJson> UpdatePageAsync(string accessTokenOrAppId, long pageId, string title, string description, string pageUrl,
             string iconUrl, string comment = null, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/page/update?access_token={0}", accessToken.AsUrlData());
 
@@ -1424,7 +1461,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     icon_url = iconUrl
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<UpdatePageResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<UpdatePageResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1436,21 +1473,21 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】根据页面Id查询页面列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="pageIds">指定页面的Id数组</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
         public static async Task<SearchPagesResultJson> SearchPagesByPageIdAsync(string accessTokenOrAppId, long[] pageIds,
-            int timeOut = Config.TIME_OUT)
+int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var data = new
                 {
                     page_ids = pageIds
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<SearchPagesResultJson>(accessToken, searchPageUrl, data, CommonJsonSendType.POST,
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<SearchPagesResultJson>(accessToken, searchPageUrl, data, CommonJsonSendType.POST,
                     timeOut);
 
             }, accessTokenOrAppId);
@@ -1459,7 +1496,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】根据分页或者指定范围查询页面列表
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="lastSeen"></param>
         /// <param name="count"></param>
         /// <param name="timeOut"></param>
@@ -1467,7 +1504,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         public static async Task<SearchPagesResultJson> SearchPagesByRangeAsync(string accessTokenOrAppId, long lastSeen, int count,
             int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var data = new
                 {
@@ -1475,7 +1512,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     count = count
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<SearchPagesResultJson>(accessToken, searchPageUrl, data, CommonJsonSendType.POST,
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<SearchPagesResultJson>(accessToken, searchPageUrl, data, CommonJsonSendType.POST,
                     timeOut);
 
             }, accessTokenOrAppId);
@@ -1486,13 +1523,13 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】删除页面
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="pageId">指定页面的Id数组</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
         public static async Task<WxJsonResult> DeletePageAsync(string accessTokenOrAppId, long pageId, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/page/delete?access_token={0}", accessToken.AsUrlData());
 
@@ -1501,7 +1538,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     page_id = pageId
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1510,7 +1547,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// 【异步方法】配置设备与页面的关联关系
         /// 配置设备与页面的关联关系。支持建立或解除关联关系，也支持新增页面或覆盖页面等操作。配置完成后，在此设备的信号范围内，即可摇出关联的页面信息。若设备配置多个页面，则随机出现页面信息。一个设备最多可配置30个关联页面。
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceIdentifier"></param>
         /// 设备编号，若填了UUID、major、minor，则可不填设备编号，若二者都填，则以设备编号为优先
         /// UUID、major、minor，三个信息需填写完整，若填了设备编号，则可不填此信息
@@ -1521,7 +1558,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<WxJsonResult> BindPageAsync(string accessTokenOrAppId, DeviceApply_Data_Device_Identifiers deviceIdentifier, long[] pageIds, ShakeAroundBindType bindType, ShakeAroundAppendType appendType, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/device/bindpage?access_token={0}", accessToken.AsUrlData());
 
@@ -1533,7 +1570,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     append = (int)appendType
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1541,13 +1578,13 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】查询设备的关联关系
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="deviceIdentifier">指定的设备</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
         public static async Task<RelationSearchResultJson> RelationSearchAsync(string accessTokenOrAppId, DeviceApply_Data_Device_Identifiers deviceIdentifier, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/relation/search?access_token={0}", accessToken.AsUrlData());
 
@@ -1557,7 +1594,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     device_identifier = deviceIdentifier
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RelationSearchResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RelationSearchResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1565,7 +1602,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <summary>
         /// 【异步方法】查询页面的关联关系
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="pageId">指定的页面id</param>
         /// <param name="begin">关联关系列表的起始索引值</param>
         /// <param name="count">待查询的关联关系数量，不能超过50个</param>
@@ -1573,7 +1610,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<RelationSearchResultJson> RelationSearchAsync(string accessTokenOrAppId, long pageId, int begin, int count, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/relation/search?access_token={0}", accessToken.AsUrlData());
 
@@ -1585,7 +1622,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     count = count
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RelationSearchResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RelationSearchResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1601,7 +1638,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         public static async Task<GetShakeInfoResultJson> GetShakeInfoAsync(string accessTokenOrAppId, string ticket, int needPoi = 1,
             int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/user/getshakeinfo?access_token={0}", accessToken.AsUrlData());
 
@@ -1611,7 +1648,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     need_poi = needPoi
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GetShakeInfoResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GetShakeInfoResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1631,7 +1668,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
             DeviceApply_Data_Device_Identifiers deviceIdentifier, long beginDate, long endDate,
             int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/statistics/device?access_token={0}", accessToken.AsUrlData());
 
@@ -1642,7 +1679,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     end_date = endDate
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<StatisticsResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<StatisticsResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1660,7 +1697,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
            long pageId, long beginDate, long endDate,
            int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/statistics/page?access_token={0}", accessToken.AsUrlData());
 
@@ -1671,7 +1708,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     end_date = endDate
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<StatisticsResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<StatisticsResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1685,7 +1722,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<DeviceListResultJson> DeviceListAsync(string accessTokenOrAppId, long date, string pageIndex, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/statistics/devicelist?access_token={0}", accessToken.AsUrlData());
 
@@ -1696,7 +1733,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
 
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceListResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<DeviceListResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1710,7 +1747,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<PageListResultJson> PageListAsync(string accessTokenOrAppId, long date, int pageIndex, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/statistics/pagelist?access_token={0}", accessToken.AsUrlData());
 
@@ -1721,7 +1758,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
 
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<PageListResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<PageListResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1734,7 +1771,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<GroupAddResultJson> GroupAddAsync(string accessTokenOrAppId, string groupName, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/add?access_token={0}", accessToken.AsUrlData());
 
@@ -1745,7 +1782,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
 
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GroupAddResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GroupAddResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1759,7 +1796,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<RegisterResultJson> GroupUpdateAsync(string accessTokenOrAppId, string groupid, string groupName, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/update?access_token={0}", accessToken.AsUrlData());
 
@@ -1771,7 +1808,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
 
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1785,7 +1822,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<RegisterResultJson> GroupDeleteAsync(string accessTokenOrAppId, string groupId, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/delete?access_token={0}", accessToken.AsUrlData());
 
@@ -1794,7 +1831,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     group_id = groupId
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1807,7 +1844,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<GroupGetListResultJson> GroupGetListAsync(string accessTokenOrAppId, int begin, int count, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/getlist?access_token={0}", accessToken.AsUrlData());
 
@@ -1817,7 +1854,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     count = count
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GroupGetListResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GroupGetListResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1831,7 +1868,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<GroupGetDetailResultJson> GroupGetDetailAsync(string accessTokenOrAppId, string groupId, int begin, int count, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
                 var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/getdetail?access_token={0}", accessToken.AsUrlData());
 
@@ -1842,7 +1879,7 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
                     count = count
                 };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GroupGetDetailResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<GroupGetDetailResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
             }, accessTokenOrAppId);
         }
@@ -1851,37 +1888,48 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// </summary>
         /// <param name="accessTokenOrAppId">调用接口凭证</param>
         /// <param name="groupId">分组唯一标识，全局唯一</param>
-        /// <param name="deviceIdentifier">分组列表的起始索引值</param>
+        /// <param name="deviceIdentifiers">分组列表的起始索引值</param>
         /// <returns></returns>
-        public static async Task<RegisterResultJson> GroupGetAdddeviceAsync(string accessTokenOrAppId, string groupId, DeviceApply_Data_Device_Identifiers deviceIdentifier, int timeOut = Config.TIME_OUT)
+        public static async Task<RegisterResultJson> GroupGetAdddeviceAsync(string accessTokenOrAppId, string groupId, List<DeviceApply_Data_Device_Identifiers> deviceIdentifiers, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync( accessToken =>
-            {
-                var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/adddevice?access_token={0}", accessToken.AsUrlData());
-                object data = null;
-                if (string.IsNullOrEmpty(((long)deviceIdentifier.device_id).ToString()))
-                {
-                    data = new
-                    {
-                        group_id = groupId,
-                        uuid = deviceIdentifier.uuid,
-                        major = deviceIdentifier.major,
-                        minor = deviceIdentifier.minor
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
+           {
+               var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/adddevice?access_token={0}", accessToken.AsUrlData());
+               object data = new
+               {
+                   group_id = groupId,
+                   device_identifiers = deviceIdentifiers.Select(item =>
+                   {
+                       object itemData = null;
+                       if (!item.device_id.HasValue)
+                       {
+                           /* UUID、major、minor，三个信息需填写完成，
+                            * 若填了设备编号，即可不填此信息，二者选其一
+                            */
+                           itemData = new
+                           {
+                               uuid = item.uuid,
+                               major = item.major,
+                               minor = item.minor
+                           };
+                       }
+                       else
+                       {
+                           /*设备编号，若填了UUID、major、minor，
+                            * 即可不填设备编号，二者选其一
+                            */
+                           itemData = new
+                           {
+                               device_id = item.device_id
+                           };
+                       }
+                       return itemData;
+                   })
+               };
 
-                    };
-                }
-                else
-                {
-                    data = new
-                    {
-                        group_id = groupId,
-                        device_id = deviceIdentifier.device_id
-                    };
-                }
+               return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
-
-            }, accessTokenOrAppId);
+           }, accessTokenOrAppId);
         }
         /// <summary>
         /// 【异步方法】从分组中移除设备
@@ -1893,34 +1941,34 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<RegisterResultJson> GroupDeleteDeviceAsync(string accessTokenOrAppId, string groupId, DeviceApply_Data_Device_Identifiers deviceIdentifier, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync( accessToken =>
-            {
-                var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/deletedevice?access_token={0}", accessToken.AsUrlData());
-                var data = new object();
-                if (!deviceIdentifier.device_id.HasValue)
-                {
-                    data = new
-                    {
-                        group_id = groupId,
-                        uuid = deviceIdentifier.uuid,
-                        major = deviceIdentifier.major,
-                        minor = deviceIdentifier.minor
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
+           {
+               var url = string.Format("https://api.weixin.qq.com/shakearound/device/group/deletedevice?access_token={0}", accessToken.AsUrlData());
+               var data = new object();
+               if (!deviceIdentifier.device_id.HasValue)
+               {
+                   data = new
+                   {
+                       group_id = groupId,
+                       uuid = deviceIdentifier.uuid,
+                       major = deviceIdentifier.major,
+                       minor = deviceIdentifier.minor
 
-                    };
-                }
-                else
-                {
-                    data = new
-                    {
-                        group_id = groupId,
-                        device_id = deviceIdentifier.device_id.Value
-                    };
-                }
+                   };
+               }
+               else
+               {
+                   data = new
+                   {
+                       group_id = groupId,
+                       device_id = deviceIdentifier.device_id.Value
+                   };
+               }
 
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+               return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<RegisterResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
-            }, accessTokenOrAppId);
+           }, accessTokenOrAppId);
         }
 
         /// <summary>
@@ -1940,26 +1988,26 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<AddLotteryInfoResultJson> AddLotteryInfoAsync(string accessTokenOrAppId, string title, string desc, int onoff, long beginTime, long expireTime, string sponsorAppid, long total, string jumpUrl, string key, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync( accessToken =>
-            {
-                var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/addlotteryinfo?access_token={0}", accessToken.AsUrlData());
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
+           {
+               var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/addlotteryinfo?access_token={0}", accessToken.AsUrlData());
 
-                var data = new
-                {
-                    title = title,
-                    desc = desc,
-                    onoff = onoff,
-                    begin_time = beginTime,
-                    expire_time = expireTime,
-                    sponsor_appid = sponsorAppid,
-                    total = total,
-                    jumpurl = jumpUrl,
-                    key = key
-                };
+               var data = new
+               {
+                   title = title,
+                   desc = desc,
+                   onoff = onoff,
+                   begin_time = beginTime,
+                   expire_time = expireTime,
+                   sponsor_appid = sponsorAppid,
+                   total = total,
+                   jumpurl = jumpUrl,
+                   key = key
+               };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<AddLotteryInfoResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+               return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<AddLotteryInfoResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
-            }, accessTokenOrAppId);
+           }, accessTokenOrAppId);
         }
         /// <summary>
         /// 【异步方法】录入红包信息
@@ -1974,23 +2022,23 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<SetPrizeBucketResultJson> SetPrizeBucketAsync(string accessTokenOrAppId, string lotteryId, string mchid, string sponsorAppid, PrizeInfoList prizeInfoList, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync( accessToken =>
-            {
-                var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/setprizebucket?access_token={0}", accessToken.AsUrlData());
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
+           {
+               var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/setprizebucket?access_token={0}", accessToken.AsUrlData());
 
-                var data = new
-                {
-                    lottery_id = lotteryId,
-                    mchid = mchid,
-                    sponsorapp_id = sponsorAppid,
-                    prizeinfolist = prizeInfoList
+               var data = new
+               {
+                   lottery_id = lotteryId,
+                   mchid = mchid,
+                   sponsorapp_id = sponsorAppid,
+                   prizeinfolist = prizeInfoList
 
 
-                };
+               };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<SetPrizeBucketResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
+               return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<SetPrizeBucketResultJson>(null, url, data, CommonJsonSendType.POST, timeOut);
 
-            }, accessTokenOrAppId);
+           }, accessTokenOrAppId);
         }
         /// <summary>
         ///【异步方法】设置红包活动抽奖开关
@@ -2002,19 +2050,19 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<WxJsonResult> SetLotterySwitchAsync(string accessTokenOrAppId, string lotteryId, int onOff, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync( accessToken =>
-            {
-                var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/setlotteryswitch?access_token={0}", accessToken.AsUrlData());
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
+           {
+               var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/setlotteryswitch?access_token={0}", accessToken.AsUrlData());
 
-                var data = new
-                {
-                    lottery_id = lotteryId,
-                    onoff = onOff
-                };
+               var data = new
+               {
+                   lottery_id = lotteryId,
+                   onoff = onOff
+               };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.GET, timeOut);
+               return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(null, url, data, CommonJsonSendType.GET, timeOut);
 
-            }, accessTokenOrAppId);
+           }, accessTokenOrAppId);
         }
         /// <summary>
         ///【异步方法】红包查询接口
@@ -2025,18 +2073,18 @@ namespace Senparc.Weixin.MP.AdvancedAPIs
         /// <returns></returns>
         public static async Task<QueryLotteryJsonResult> QueryLotteryAsync(string accessTokenOrAppId, string lotteryId, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync( accessToken =>
-            {
-                var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/querylottery?access_token={0}", accessToken.AsUrlData());
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
+           {
+               var url = string.Format("https://api.weixin.qq.com/shakearound/lottery/querylottery?access_token={0}", accessToken.AsUrlData());
 
-                var data = new
-                {
-                    lottery_id = lotteryId
-                };
+               var data = new
+               {
+                   lottery_id = lotteryId
+               };
 
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<QueryLotteryJsonResult>(null, url, data, CommonJsonSendType.GET, timeOut);
+               return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<QueryLotteryJsonResult>(null, url, data, CommonJsonSendType.GET, timeOut);
 
-            }, accessTokenOrAppId);
+           }, accessTokenOrAppId);
         }
         #endregion
     }

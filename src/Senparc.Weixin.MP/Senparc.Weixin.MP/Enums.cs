@@ -1,4 +1,24 @@
-﻿/*----------------------------------------------------------------
+﻿#region Apache License Version 2.0
+/*----------------------------------------------------------------
+
+Copyright 2017 Jeffrey Su & Suzhou Senparc Network Technology Co.,Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
+
+----------------------------------------------------------------*/
+#endregion Apache License Version 2.0
+
+/*----------------------------------------------------------------
     Copyright (C) 2017 Senparc
   
     文件名：Enums.cs
@@ -46,6 +66,11 @@
     修改标识：Senparc - 20170106
     修改描述：v14.3.117 ResponseMsgType添加SuccessResponse枚举
 
+    修改标识：Senparc - 20170328
+    修改描述：v14.3.139 ButtonType添加小程序类型
+
+    修改标识：Senparc - 20170807
+    修改描述：v14.5.7 添加TenPayV3Type.MWEB枚举，支持H5支付
 ----------------------------------------------------------------*/
 
 using System.ComponentModel;
@@ -222,6 +247,26 @@ namespace Senparc.Weixin.MP
         /// 摇一摇事件通知
         /// </summary>
         ShakearoundUserShake,
+        /// <summary>
+        /// 卡券转赠事件推送
+        /// </summary>
+        user_gifting_card,
+        /// <summary>
+        /// 微信买单完成
+        /// </summary>
+        user_pay_from_pay_cell,
+        /// <summary>
+        /// 会员卡内容更新事件：会员卡积分余额发生变动时
+        /// </summary>
+        update_member_card,
+        /// <summary>
+        /// 卡券库存报警事件：当某个card_id的初始库存数大于200且当前库存小于等于100时
+        /// </summary>
+        card_sku_remind,
+        /// <summary>
+        /// 券点流水详情事件：当商户朋友的券券点发生变动时
+        /// </summary>
+        card_pay_order
     }
 
 
@@ -270,6 +315,10 @@ namespace Senparc.Weixin.MP
         /// Url
         /// </summary>
         view,
+        /// <summary>
+        /// 小程序
+        /// </summary>
+        miniprogram,
         /// <summary>
         /// 扫码推事件
         /// </summary>
@@ -340,11 +389,16 @@ namespace Senparc.Weixin.MP
     //    涉嫌互推 = 22000,
     //    涉嫌其他 = 21000
     //}
+
+    /// <summary>
+    /// 支付类型
+    /// </summary>
     public enum TenPayV3Type
     {
         JSAPI,
         NATIVE,
-        APP
+        APP,
+        MWEB
     }
 
     public enum GroupMessageType
@@ -850,7 +904,11 @@ namespace Senparc.Weixin.MP
         /// <summary>
         /// 永久的字符串
         /// </summary>
-        QR_LIMIT_STR_SCENE
+        QR_LIMIT_STR_SCENE,
+        /// <summary>
+        /// 临时的字符串参数值
+        /// </summary>
+        QR_STR_SCENE
     }
 
     /// <summary>

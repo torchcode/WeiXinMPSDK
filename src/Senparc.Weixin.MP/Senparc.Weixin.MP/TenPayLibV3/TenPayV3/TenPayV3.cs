@@ -1,4 +1,24 @@
-﻿/*----------------------------------------------------------------
+﻿#region Apache License Version 2.0
+/*----------------------------------------------------------------
+
+Copyright 2017 Jeffrey Su & Suzhou Senparc Network Technology Co.,Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
+
+----------------------------------------------------------------*/
+#endregion Apache License Version 2.0
+
+/*----------------------------------------------------------------
     Copyright (C) 2017 Senparc
  
     文件名：TenPayV3.cs
@@ -41,13 +61,23 @@
     修改描述：v14.3.112 迁移企业支付方法
 
     修改标识：Senparc - 20170215
-    修改描述：v14.3.113 增加 Transfers和TransfersAsync方法重载
+    修改描述：v14.3.126 增加 Transfers和TransfersAsync方法重载
 
     修改标识：Senparc - 20170215
-    修改描述：v14.3.113 增加 GetTransferInfo和GetTransferInfoAsync方法重载
+    修改描述：v14.3.126 增加 GetTransferInfo和GetTransferInfoAsync方法重载
 
-     修改标识：Senparc - 20170215
-    修改描述：v14.3.113 增加 DownloadBill和DownloadBillAsync方法重载
+    修改标识：Senparc - 20170215
+    修改描述：v14.3.126 增加 DownloadBill和DownloadBillAsync方法重载
+    
+    修改标识：Senparc - 20170508
+    修改描述：v14.4.6 1、修复企业付款接口无法指定证书的问题（TenpayV3.Transfers）
+                      2、添加CertPost()及配套异步方法
+    
+    修改标识：Senparc - 20170815
+    修改描述：v14.4.6 增加 ReverseAsync 方法重载
+    
+    修改标识：Senparc - 20170815
+    修改描述：v14.6.1 撤销订单接口（TenPayV3.Reverse()）添加证书设置
     
 ----------------------------------------------------------------*/
 
@@ -57,6 +87,9 @@
 
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -69,8 +102,67 @@ namespace Senparc.Weixin.MP.TenPayLibV3
     /// </summary>
     public static class TenPayV3
     {
-        #region 同步请求
+        #region 私有方法
 
+
+        /// <summary>
+        /// 带证书提交
+        /// </summary>
+        /// <param name="cert">证书绝对路径</param>
+        /// <param name="certPassword">证书密码</param>
+        /// <param name="data">数据</param>
+        /// <param name="url">Url</param>
+        /// <returns></returns>
+        private static string CertPost(string cert, string certPassword, string data, string url, int timeOut = Config.TIME_OUT)
+        {
+            string password = certPassword;
+            var dataBytes = Encoding.UTF8.GetBytes(data);
+            using (MemoryStream ms = new MemoryStream(dataBytes))
+            {
+                //调用证书
+                X509Certificate2 cer = new X509Certificate2(cert, certPassword, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.MachineKeySet);
+
+                string responseContent = HttpUtility.RequestUtility.HttpPost(
+                    url,
+                    postStream: ms,
+                    cer: cer,
+                    timeOut: timeOut);
+
+                return responseContent;
+            }
+        }
+
+        /// <summary>
+        /// 【异步方法】带证书提交
+        /// </summary>
+        /// <param name="cert">证书绝对路径</param>
+        /// <param name="certPassword">证书密码</param>
+        /// <param name="data">数据</param>
+        /// <param name="url">Url</param>
+        /// <returns></returns>
+        private static async Task<string> CertPostAsync(string cert, string certPassword, string data, string url, int timeOut = Config.TIME_OUT)
+        {
+            string password = certPassword;
+            var dataBytes = Encoding.UTF8.GetBytes(data);
+            using (MemoryStream ms = new MemoryStream(dataBytes))
+            {
+                //调用证书
+                X509Certificate2 cer = new X509Certificate2(cert, certPassword, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.MachineKeySet);
+
+                string responseContent = await HttpUtility.RequestUtility.HttpPostAsync(
+                    url,
+                    postStream: ms,
+                    cer: cer,
+                    timeOut: timeOut);
+
+                return responseContent;
+            }
+        }
+
+
+        #endregion
+
+        #region 同步请求
         /// <summary>
         /// 统一支付接口
         /// 统一支付接口，可接受JSAPI/NATIVE/APP 下预支付订单，返回预支付订单号。NATIVE 支付返回二维码code_url。
@@ -112,6 +204,28 @@ namespace Senparc.Weixin.MP.TenPayLibV3
         }
 
         /// <summary>
+        /// H5支付接口（和“统一支付接口”近似）
+        /// </summary>
+        /// <param name="dataInfo">微信支付需要post的Data数据，TradeType将会强制赋值为TenPayV3Type.MWEB</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
+        public static UnifiedorderResult Html5Order(TenPayV3UnifiedorderRequestData dataInfo, int timeOut = Config.TIME_OUT)
+        {
+            var urlFormat = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+            dataInfo.TradeType = TenPayV3Type.MWEB;
+
+            var data = dataInfo.PackageRequestHandler.ParseXML();//获取XML
+            //throw new Exception(data.HtmlEncode());
+            MemoryStream ms = new MemoryStream();
+            var formDataBytes = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
+            ms.Write(formDataBytes, 0, formDataBytes.Length);
+            ms.Seek(0, SeekOrigin.Begin);//设置指针读取位置
+
+            var resultXml = RequestUtility.HttpPost(urlFormat, null, ms, timeOut: timeOut);
+            return new UnifiedorderResult(resultXml);
+        }
+
+        /// <summary>
         /// 获取UI使用的JS支付签名
         /// </summary>
         /// <param name="appId"></param>
@@ -129,7 +243,7 @@ namespace Senparc.Weixin.MP.TenPayLibV3
             paySignReqHandler.SetParameter("timeStamp", timeStamp);
             paySignReqHandler.SetParameter("nonceStr", nonceStr);
             paySignReqHandler.SetParameter("package", package);
-            paySignReqHandler.SetParameter("signType", "MD5");
+            paySignReqHandler.SetParameter("signType", signType);
             var paySign = paySignReqHandler.CreateMd5Sign("key", key);
             return paySign;
         }
@@ -242,6 +356,7 @@ namespace Senparc.Weixin.MP.TenPayLibV3
         /// </summary>
         /// <param name="dataInfo"></param>
         /// <returns></returns>
+        [Obsolete("此方法已过期 建议使用Reverse(TenPayV3ReverseRequestData dataInfo, string cert, string certPassword)")]
         public static ReverseResult Reverse(TenPayV3ReverseRequestData dataInfo)
         {
             var urlFormat = "https://api.mch.weixin.qq.com/secapi/pay/reverse";
@@ -254,22 +369,63 @@ namespace Senparc.Weixin.MP.TenPayLibV3
             return new ReverseResult(resultXml);
         }
 
-        //退款申请请直接参考Senparc.Weixin.MP.Sample中的退款demo
-        ///// <summary>
-        ///// 退款申请接口
-        ///// </summary>
-        ///// <param name="data"></param>
-        ///// <returns></returns>
-        //public static string Refund(string data)
-        //{
-        //    var urlFormat = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+        /// <summary>
+        /// 撤销订单接口
+        /// </summary>
+        /// <param name="dataInfo"></param>
+        /// <param name="cert">证书绝对路径，如@"F:\apiclient_cert.p12"</param> 
+        /// <param name="certPassword">证书密码</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
+        public static ReverseResult Reverse(TenPayV3ReverseRequestData dataInfo, string cert, string certPassword, int timeOut = Config.TIME_OUT)
+        {
+            string urlFormat = "https://api.mch.weixin.qq.com/secapi/pay/reverse";
+            var data = dataInfo.PackageRequestHandler.ParseXML();
+            //var dataBytes = Encoding.UTF8.GetBytes(data);
+            //using (MemoryStream ms = new MemoryStream(dataBytes))
+            //{
+            //调用证书
+            X509Certificate2 cer = new X509Certificate2(cert, certPassword, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.MachineKeySet);
+            string responseContent = CertPost(cert, certPassword, data, urlFormat, timeOut);
+            return new ReverseResult(responseContent);
+            //  }
+        }
 
-        //    var formDataBytes = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
-        //    MemoryStream ms = new MemoryStream();
-        //    ms.Write(formDataBytes, 0, formDataBytes.Length);
-        //    ms.Seek(0, SeekOrigin.Begin);//设置指针读取位置
-        //    return Senparc.Weixin.HttpUtility.RequestUtility.HttpPost(urlFormat, null, ms);
-        //}
+        private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
+        {
+            if (errors == SslPolicyErrors.None)
+                return true;
+            return false;
+        }
+
+        //退款申请请可参考Senparc.Weixin.MP.Sample中的退款demo
+        /// <summary>
+        /// 退款申请接口
+        /// </summary>
+        /// <param name="dataInfo"></param>
+        /// <param name="cert">证书绝对路径，如@"F:\apiclient_cert.p12"</param>
+        /// <param name="certPassword">证书密码</param>
+        /// <returns></returns>
+        public static RefundResult Refund(TenPayV3RefundRequestData dataInfo, string cert, string certPassword, int timeOut = Config.TIME_OUT)
+        {
+            //退款接口地址
+            string url = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+
+            //本地或者服务器的证书位置（证书在微信支付申请成功发来的通知邮件中）
+            //string cert = cert;// @"F:\apiclient_cert.p12";
+            //私钥（在安装证书时设置）
+
+            var data = dataInfo.PackageRequestHandler.ParseXML();
+            var dataBytes = Encoding.UTF8.GetBytes(data);
+            using (MemoryStream ms = new MemoryStream(dataBytes))
+            {
+                //调用证书
+                X509Certificate2 cer = new X509Certificate2(cert, certPassword, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.MachineKeySet);
+
+                string responseContent = CertPost(cert, certPassword, data, url, timeOut);
+                return new RefundResult(responseContent);
+            }
+        }
 
         /// <summary>
         /// 退款查询接口
@@ -325,6 +481,7 @@ namespace Senparc.Weixin.MP.TenPayLibV3
 
         /// <summary>
         /// 对账单接口
+        /// https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_6
         /// </summary>
         /// <param name="dataInfo"></param>
         /// <returns></returns>
@@ -336,7 +493,7 @@ namespace Senparc.Weixin.MP.TenPayLibV3
             MemoryStream ms = new MemoryStream();
             ms.Write(formDataBytes, 0, formDataBytes.Length);
             ms.Seek(0, SeekOrigin.Begin);//设置指针读取位置
-            return RequestUtility.HttpPost(urlFormat, null, ms);
+            return RequestUtility.HttpPost(urlFormat, null, ms, encoding: Encoding.UTF8);
         }
 
         /// <summary>
@@ -418,16 +575,12 @@ namespace Senparc.Weixin.MP.TenPayLibV3
         /// <param name="dataInfo">微信支付需要post的xml数据</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
-        public static TransfersResult Transfers(TenPayV3TransfersRequestData dataInfo, int timeOut = Config.TIME_OUT)
+        public static TransfersResult Transfers(TenPayV3TransfersRequestData dataInfo, string cert, string certPassword, int timeOut = Config.TIME_OUT)
         {
-            var urlFormat = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+            var url = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
             var data = dataInfo.PackageRequestHandler.ParseXML();
-            var formDataBytes = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
-            MemoryStream ms = new MemoryStream();
-            ms.Write(formDataBytes, 0, formDataBytes.Length);
-            ms.Seek(0, SeekOrigin.Begin);//设置指针读取位置
-            var result = RequestUtility.HttpPost(urlFormat, null, ms, timeOut: timeOut);
-            return new TransfersResult(result);
+            string responseContent = CertPost(cert, certPassword, data, url);
+            return new TransfersResult(responseContent);
         }
 
 
@@ -529,6 +682,29 @@ namespace Senparc.Weixin.MP.TenPayLibV3
             return new UnifiedorderResult(resultXml);
         }
 
+        //退款申请请可参考Senparc.Weixin.MP.Sample中的退款demo
+        /// <summary>
+        /// 【异步方法】退款申请接口
+        /// </summary>
+        /// <param name="dataInfo"></param>
+        /// <param name="cert">证书绝对路径，如@"F:\apiclient_cert.p12"</param>
+        /// <param name="certPassword">证书密码</param>
+        /// <returns></returns>
+        public static async Task<RefundResult> RefundAsync(TenPayV3RefundRequestData dataInfo, string cert, string certPassword)
+        {
+            var data = dataInfo.PackageRequestHandler.ParseXML();
+
+            //var urlFormat = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+
+            //退款接口地址
+            string url = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+            //本地或者服务器的证书位置（证书在微信支付申请成功发来的通知邮件中）
+            //string cert = cert;// @"F:\apiclient_cert.p12";
+            //私钥（在安装证书时设置）
+            string responseContent = await CertPostAsync(cert, certPassword, data, url);
+            return new RefundResult(responseContent);
+        }
+
         /// <summary>
         /// 【异步方法】订单查询接口
         /// </summary>
@@ -624,6 +800,7 @@ namespace Senparc.Weixin.MP.TenPayLibV3
         /// </summary>
         /// <param name="dataInfo"></param>
         /// <returns></returns>
+        [Obsolete("此方法已过期 建议使用 ReverseAsync(TenPayV3ReverseRequestData dataInfo, string cert, string certPassword)")]
         public static async Task<ReverseResult> ReverseAsync(TenPayV3ReverseRequestData dataInfo)
         {
             var urlFormat = "https://api.mch.weixin.qq.com/secapi/pay/reverse";
@@ -636,6 +813,27 @@ namespace Senparc.Weixin.MP.TenPayLibV3
             return new ReverseResult(resutlXml);
         }
 
+        /// <summary>
+        /// 【异步方法】撤销订单接口
+        /// </summary>
+        /// <param name="dataInfo"></param>
+        /// <param name="cert">证书绝对路径，如@"F:\apiclient_cert.p12"</param> 
+        /// <param name="certPassword">证书密码</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
+        public static async Task<ReverseResult> ReverseAsync(TenPayV3ReverseRequestData dataInfo, string cert, string certPassword, int timeOut = Config.TIME_OUT)
+        {
+            string urlFormat = "https://api.mch.weixin.qq.com/secapi/pay/reverse";
+            var data = dataInfo.PackageRequestHandler.ParseXML();
+            //var dataBytes = Encoding.UTF8.GetBytes(data);
+            //using (MemoryStream ms = new MemoryStream(dataBytes))
+            //{
+                //调用证书
+                X509Certificate2 cer = new X509Certificate2(cert, certPassword, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.MachineKeySet);
+                var responseContent = await CertPostAsync(cert, certPassword, data, urlFormat, timeOut);
+                return new ReverseResult(responseContent);
+            //}
+        }
 
         //退款申请请直接参考Senparc.Weixin.MP.Sample中的退款demo
         ///// <summary>
@@ -799,17 +997,12 @@ namespace Senparc.Weixin.MP.TenPayLibV3
         /// <param name="dataInfo">微信支付需要post的xml数据</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
-        public static async Task<TransfersResult> TransfersAsync(TenPayV3TransfersRequestData dataInfo, int timeOut = Config.TIME_OUT)
+        public static async Task<TransfersResult> TransfersAsync(TenPayV3TransfersRequestData dataInfo, string cert, string certPassword, int timeOut = Config.TIME_OUT)
         {
-            var urlFormat = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
-
+            var url = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
             var data = dataInfo.PackageRequestHandler.ParseXML();
-            var formDataBytes = data == null ? new byte[0] : Encoding.UTF8.GetBytes(data);
-            MemoryStream ms = new MemoryStream();
-            ms.Write(formDataBytes, 0, formDataBytes.Length);
-            ms.Seek(0, SeekOrigin.Begin);//设置指针读取位置
-            var result = await RequestUtility.HttpPostAsync(urlFormat, null, ms, timeOut: timeOut);
-            return new TransfersResult(result);
+            string responseContent = await CertPostAsync(cert, certPassword, data, url);
+            return new TransfersResult(responseContent);
         }
 
         /// <summary>

@@ -1,4 +1,24 @@
-﻿/*----------------------------------------------------------------
+﻿#region Apache License Version 2.0
+/*----------------------------------------------------------------
+
+Copyright 2017 Jeffrey Su & Suzhou Senparc Network Technology Co.,Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
+
+----------------------------------------------------------------*/
+#endregion Apache License Version 2.0
+
+/*----------------------------------------------------------------
     Copyright (C) 2017 Senparc
     
     文件名：MessageHandler.Event.cs
@@ -118,6 +138,21 @@ namespace Senparc.Weixin.MP.MessageHandlers
                     break;
                 case Event.ShakearoundUserShake://摇一摇事件通知
                     responseMessage = OnEvent_ShakearoundUserShake(RequestMessage as RequestMessageEvent_ShakearoundUserShake);
+                    break;
+                case Event.user_gifting_card://卡券转赠事件推送
+                    responseMessage = OnEvent_User_Gifting_Card(RequestMessage as RequestMessageEvent_User_Gifting_Card);
+                    break;
+                case Event.user_pay_from_pay_cell://微信买单完成
+                    responseMessage = OnEvent_User_Pay_From_Pay_Cell(RequestMessage as RequestMessageEvent_User_Pay_From_Pay_Cell);
+                    break;
+                case Event.update_member_card://会员卡内容更新事件：会员卡积分余额发生变动时
+                    responseMessage = OnEvent_Update_Member_Card(RequestMessage as RequestMessageEvent_Update_Member_Card);
+                    break;
+                case Event.card_sku_remind://卡券库存报警事件：当某个card_id的初始库存数大于200且当前库存小于等于100时
+                    responseMessage = OnEvent_Card_Sku_Remind(RequestMessage as RequestMessageEvent_Card_Sku_Remind);
+                    break;
+                case Event.card_pay_order://券点流水详情事件：当商户朋友的券券点发生变动时
+                    responseMessage = OnEvent_Card_Pay_Order(RequestMessage as RequestMessageEvent_Card_Pay_Order);
                     break;
                 default:
                     throw new UnknownRequestMsgTypeException("未知的Event下属请求信息", null);
@@ -385,6 +420,51 @@ public virtual IResponseMessageBase OnEvent_ShakearoundUserShake(RequestMessageE
     //return DefaultResponseMessage(requestMessage);
 }
 
-#endregion
+        /// <summary>
+        /// 卡券转赠事件推送
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
+        public virtual IResponseMessageBase OnEvent_User_Gifting_Card(RequestMessageEvent_User_Gifting_Card requestMessage)
+        {
+           return DefaultResponseMessage(requestMessage);
+        }
+        /// <summary>
+        /// 微信买单完成
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
+        public virtual IResponseMessageBase OnEvent_User_Pay_From_Pay_Cell(RequestMessageEvent_User_Pay_From_Pay_Cell requestMessage)
+        {
+            return DefaultResponseMessage(requestMessage);
+        }
+        /// <summary>
+        /// 会员卡内容更新事件：会员卡积分余额发生变动时
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
+        public virtual IResponseMessageBase OnEvent_Update_Member_Card(RequestMessageEvent_Update_Member_Card requestMessage)
+        {
+            return DefaultResponseMessage(requestMessage);
+        }
+        /// <summary>
+        /// 卡券库存报警事件：当某个card_id的初始库存数大于200且当前库存小于等于100时
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
+        public virtual IResponseMessageBase OnEvent_Card_Sku_Remind(RequestMessageEvent_Card_Sku_Remind requestMessage)
+        {
+            return DefaultResponseMessage(requestMessage);
+        }
+        /// <summary>
+        /// 券点流水详情事件：当商户朋友的券券点发生变动时
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
+        public virtual IResponseMessageBase OnEvent_Card_Pay_Order(RequestMessageEvent_Card_Pay_Order requestMessage)
+        {
+            return DefaultResponseMessage(requestMessage);
+        }
+        #endregion
     }
 }

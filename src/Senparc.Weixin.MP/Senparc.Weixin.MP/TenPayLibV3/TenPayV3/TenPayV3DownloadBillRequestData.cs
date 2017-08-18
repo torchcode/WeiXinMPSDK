@@ -1,10 +1,34 @@
-﻿/*----------------------------------------------------------------
-    Copyright (C) 2016 Senparc
+﻿#region Apache License Version 2.0
+/*----------------------------------------------------------------
+
+Copyright 2017 Jeffrey Su & Suzhou Senparc Network Technology Co.,Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
+
+----------------------------------------------------------------*/
+#endregion Apache License Version 2.0
+
+/*----------------------------------------------------------------
+    Copyright (C) 2017 Senparc
   
     文件名：TenPayV3DownloadBillRequestData.cs
     文件功能描述：微信支付下载对账单请求参数 
     
     创建标识：Senparc - 20170215
+    
+    修改标识：Senparc - 20170716
+    修改描述：修改TenPayV3DownloadBillRequestData
+
 ----------------------------------------------------------------*/
 
 namespace Senparc.Weixin.MP.TenPayLibV3
@@ -77,6 +101,8 @@ namespace Senparc.Weixin.MP.TenPayLibV3
         public TenPayV3DownloadBillRequestData(string appId, string mchId, string nonceStr, string deviceInfo,
             string billDate, string billType, string key, string tarType = "GZIP", string signType = "MD5")
         {
+            PackageRequestHandler = new RequestHandler();
+
             AppId = appId;
             MchId = mchId;
             NonceStr = nonceStr;
@@ -92,12 +118,12 @@ namespace Senparc.Weixin.MP.TenPayLibV3
             //设置package订单参数
             PackageRequestHandler.SetParameter("appid", this.AppId); //公众账号ID
             PackageRequestHandler.SetParameter("mch_id", this.MchId); //商户号
-            PackageRequestHandler.SetParameter("device_info", this.DeviceInfo); //设备号
+            PackageRequestHandler.SetParameterWhenNotNull("device_info", this.DeviceInfo); //设备号
             PackageRequestHandler.SetParameter("nonce_str", this.NonceStr); //随机字符串
-            PackageRequestHandler.SetParameter("sign_type", this.SignType); //签名类型
+            PackageRequestHandler.SetParameterWhenNotNull("sign_type", this.SignType); //签名类型
             PackageRequestHandler.SetParameter("bill_date", this.BillDate); //对账单日期
             PackageRequestHandler.SetParameter("bill_type", this.BillType); //账单类型
-            PackageRequestHandler.SetParameter("tar_type", this.TarType); //压缩账单
+            PackageRequestHandler.SetParameterWhenNotNull("tar_type", this.TarType); //压缩账单
 
             Sign = PackageRequestHandler.CreateMd5Sign("key", this.Key);
             PackageRequestHandler.SetParameter("sign", Sign); //签名

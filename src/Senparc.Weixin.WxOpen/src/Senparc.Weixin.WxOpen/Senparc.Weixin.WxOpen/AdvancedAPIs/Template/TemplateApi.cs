@@ -1,8 +1,34 @@
-﻿/*----------------------------------------------------------------
+﻿#region Apache License Version 2.0
+/*----------------------------------------------------------------
+
+Copyright 2017 Jeffrey Su & Suzhou Senparc Network Technology Co.,Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
+
+----------------------------------------------------------------*/
+#endregion Apache License Version 2.0
+
+/*----------------------------------------------------------------
     Copyright (C) 2017 Senparc
     
     文件名：TemplateAPI.cs
     文件功能描述：小程序的模板消息接口
+
+    修改标识：Senparc - 20170225
+    修改描述：v1.2.1 修改模板消息URL
+
+    修改标识：Senparc - 20170707
+    修改描述：v14.5.1 完善异步方法async/await
 
 ----------------------------------------------------------------*/
 
@@ -28,7 +54,7 @@ namespace Senparc.Weixin.WxOpen.AdvancedAPIs.Template
         /// <summary>
         /// 小程序模板消息接口
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="openId"></param>
         /// <param name="templateId"></param>
         /// <param name="data"></param>
@@ -42,7 +68,7 @@ namespace Senparc.Weixin.WxOpen.AdvancedAPIs.Template
         {
             return ApiHandlerWapper.TryCommonApi(accessToken =>
             {
-                const string urlFormat = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={0}";
+                const string urlFormat = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token={0}";
                 var msgData = new TempleteModel()
                 {
                     touser = openId,
@@ -95,7 +121,7 @@ namespace Senparc.Weixin.WxOpen.AdvancedAPIs.Template
         /// <summary>
         /// 【异步方法】小程序模板消息接口
         /// </summary>
-        /// <param name="accessTokenOrAppId"></param>
+        /// <param name="accessTokenOrAppId">AccessToken或AppId（推荐使用AppId，需要先注册）</param>
         /// <param name="openId"></param>
         /// <param name="templateId"></param>
         /// <param name="data"></param>
@@ -106,9 +132,9 @@ namespace Senparc.Weixin.WxOpen.AdvancedAPIs.Template
         /// <returns></returns>
         public static async Task<WxJsonResult> SendTemplateMessageAsync(string accessTokenOrAppId, string openId, string templateId, object data, string formId, string page = null, string emphasisKeyword = null, int timeOut = Config.TIME_OUT)
         {
-            return await ApiHandlerWapper.TryCommonApiAsync(accessToken =>
+            return await ApiHandlerWapper.TryCommonApiAsync(async accessToken =>
             {
-                const string urlFormat = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={0}";
+                const string urlFormat = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token={0}";
                 var msgData = new TempleteModel()
                 {
                     touser = openId,
@@ -120,7 +146,7 @@ namespace Senparc.Weixin.WxOpen.AdvancedAPIs.Template
                     emphasis_keyword = emphasisKeyword,
                 };
             
-                return Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(accessToken, urlFormat, msgData, timeOut: timeOut);
+                return await Senparc.Weixin.CommonAPIs.CommonJsonSend.SendAsync<WxJsonResult>(accessToken, urlFormat, msgData, timeOut: timeOut);
 
             }, accessTokenOrAppId);
         }

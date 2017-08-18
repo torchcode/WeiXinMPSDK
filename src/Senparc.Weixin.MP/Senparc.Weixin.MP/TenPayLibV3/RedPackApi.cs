@@ -1,4 +1,24 @@
-﻿/*----------------------------------------------------------------
+﻿#region Apache License Version 2.0
+/*----------------------------------------------------------------
+
+Copyright 2017 Jeffrey Su & Suzhou Senparc Network Technology Co.,Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
+
+----------------------------------------------------------------*/
+#endregion Apache License Version 2.0
+
+/*----------------------------------------------------------------
     Copyright (C) 2017 Senparc
   
     文件名：RedPackApi.cs
@@ -15,6 +35,10 @@
 
     修改标识：Senparc - 20170110
     修改描述：v14.3.118  
+
+    修改标识：Senparc - 201700810
+    修改描述：v14.5.9 查询红包接口（SearchRedPack）添加refund_amount和remark两个参数获取
+
 ----------------------------------------------------------------*/
 
 using System;
@@ -620,10 +644,18 @@ PROCESSING	请求已受理，请稍后使用原单号查询发放结果	二十�
                     {
                         searchReturn.refund_time = doc.SelectSingleNode("/xml/refund_time").InnerText;
                     }
+                    if (doc.SelectSingleNode("/xml/refund_amount") != null)
+                    {
+                        searchReturn.refund_amount = doc.SelectSingleNode("/xml/refund_amount").InnerText;
+                    }
 
                     if (doc.SelectSingleNode("/xml/wishing") != null)
                     {
                         searchReturn.wishing = doc.SelectSingleNode("/xml/wishing").InnerText;
+                    }
+                    if (doc.SelectSingleNode("/xml/remark") != null)
+                    {
+                        searchReturn.remark = doc.SelectSingleNode("/xml/remark").InnerText;
                     }
 
                     if (doc.SelectSingleNode("/xml/act_name") != null)
